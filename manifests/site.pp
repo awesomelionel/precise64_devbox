@@ -8,9 +8,6 @@ include apache2
 include mysql
 include vim
 include php
-include curl
-
-class {'curl':}
 
 class { 'rbenv': }
 rbenv::plugin { [ 'sstephenson/rbenv-vars', 'sstephenson/ruby-build' ]: }

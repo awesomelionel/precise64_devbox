@@ -22,7 +22,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--name", "devbox"]
 	end
 
-	config.vm.synced_folder "./", "/var/www/webapp", id: "vagrant-root"
+	config.vm.synced_folder "./", "/vagrant"
+	config.vm.synced_folder "./www", "/var/www/"
 	#config.vm.synced_folder "puppet", "/etc/puppet"
 	config.vm.provision "puppet" do |puppet|
 		puppet.manifests_path = "manifests"
