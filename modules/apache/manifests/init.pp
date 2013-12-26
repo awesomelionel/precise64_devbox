@@ -1,155 +1,148 @@
-# = Class: mysql
+# = Class: apache
 #
-# This is the main mysql class
+# This is the main apache class
 #
 #
 # == Parameters
-#
-# Class specifi variables
-#
-# [*root_password*]
-#   The mysql password of the root user.
-#   If blank, no password is set
-#   If 'auto' a random password is generated
 #
 # Standard class parameters
 # Define the general class behaviour and customizations
 #
 # [*my_class*]
 #   Name of a custom class to autoload to manage module's customizations
-#   If defined, mysql class will automatically "include $my_class"
-#   Can be defined also by the (top scope) variable $mysql_myclass
+#   If defined, apache class will automatically "include $my_class"
+#   Can be defined also by the (top scope) variable $apache_myclass
 #
 # [*source*]
 #   Sets the content of source parameter for main configuration file
-#   If defined, mysql main config file will have the param: source => $source
-#   Can be defined also by the (top scope) variable $mysql_source
+#   If defined, apache main config file will have the param: source => $source
+#   Can be defined also by the (top scope) variable $apache_source
 #
 # [*source_dir*]
-#   If defined, the whole mysql configuration directory content is retrieved
+#   If defined, the whole apache configuration directory content is retrieved
 #   recursively from the specified source
 #   (source => $source_dir , recurse => true)
-#   Can be defined also by the (top scope) variable $mysql_source_dir
+#   Can be defined also by the (top scope) variable $apache_source_dir
 #
 # [*source_dir_purge*]
 #   If set to true (default false) the existing configuration directory is
 #   mirrored with the content retrieved from source_dir
 #   (source => $source_dir , recurse => true , purge => true)
-#   Can be defined also by the (top scope) variable $mysql_source_dir_purge
+#   Can be defined also by the (top scope) variable $apache_source_dir_purge
 #
 # [*template*]
 #   Sets the path to the template to use as content for main configuration file
-#   If defined, mysql main config file has: content => content("$template")
+#   If defined, apache main config file has: content => content("$template")
 #   Note source and template parameters are mutually exclusive: don't use both
-#   Can be defined also by the (top scope) variable $mysql_template
+#   Can be defined also by the (top scope) variable $apache_template
 #
 # [*options*]
 #   An hash of custom options to be used in templates for arbitrary settings.
-#   Can be defined also by the (top scope) variable $mysql_options
+#   Can be defined also by the (top scope) variable $apache_options
 #
 # [*service_autorestart*]
-#   Automatically restarts the mysql service when there is a change in
+#   Automatically restarts the apache service when there is a change in
 #   configuration files. Default: true, Set to false if you don't want to
 #   automatically restart the service.
 #
 # [*absent*]
 #   Set to 'true' to remove package(s) installed by module
-#   Can be defined also by the (top scope) variable $mysql_absent
+#   Can be defined also by the (top scope) variable $apache_absent
 #
 # [*disable*]
 #   Set to 'true' to disable service(s) managed by module
-#   Can be defined also by the (top scope) variable $mysql_disable
+#   Can be defined also by the (top scope) variable $apache_disable
 #
 # [*disableboot*]
 #   Set to 'true' to disable service(s) at boot, without checks if it's running
 #   Use this when the service is managed by a tool like a cluster software
-#   Can be defined also by the (top scope) variable $mysql_disableboot
+#   Can be defined also by the (top scope) variable $apache_disableboot
 #
 # [*monitor*]
 #   Set to 'true' to enable monitoring of the services provided by the module
-#   Can be defined also by the (top scope) variables $mysql_monitor
+#   Can be defined also by the (top scope) variables $apache_monitor
 #   and $monitor
 #
 # [*monitor_tool*]
 #   Define which monitor tools (ad defined in Example42 monitor module)
-#   you want to use for mysql checks
-#   Can be defined also by the (top scope) variables $mysql_monitor_tool
+#   you want to use for apache checks
+#   Can be defined also by the (top scope) variables $apache_monitor_tool
 #   and $monitor_tool
 #
 # [*monitor_target*]
 #   The Ip address or hostname to use as a target for monitoring tools.
 #   Default is the fact $ipaddress
-#   Can be defined also by the (top scope) variables $mysql_monitor_target
+#   Can be defined also by the (top scope) variables $apache_monitor_target
 #   and $monitor_target
 #
 # [*puppi*]
 #   Set to 'true' to enable creation of module data files that are used by puppi
-#   Can be defined also by the (top scope) variables $mysql_puppi and $puppi
+#   Can be defined also by the (top scope) variables $apache_puppi and $puppi
 #
 # [*puppi_helper*]
 #   Specify the helper to use for puppi commands. The default for this module
 #   is specified in params.pp and is generally a good choice.
 #   You can customize the output of puppi commands for this module using another
 #   puppi helper. Use the define puppi::helper to create a new custom helper
-#   Can be defined also by the (top scope) variables $mysql_puppi_helper
+#   Can be defined also by the (top scope) variables $apache_puppi_helper
 #   and $puppi_helper
 #
 # [*firewall*]
 #   Set to 'true' to enable firewalling of the services provided by the module
-#   Can be defined also by the (top scope) variables $mysql_firewall
+#   Can be defined also by the (top scope) variables $apache_firewall
 #   and $firewall
 #
 # [*firewall_tool*]
 #   Define which firewall tool(s) (ad defined in Example42 firewall module)
-#   you want to use to open firewall for mysql port(s)
-#   Can be defined also by the (top scope) variables $mysql_firewall_tool
+#   you want to use to open firewall for apache port(s)
+#   Can be defined also by the (top scope) variables $apache_firewall_tool
 #   and $firewall_tool
 #
 # [*firewall_src*]
-#   Define which source ip/net allow for firewalling mysql. Default: 0.0.0.0/0
-#   Can be defined also by the (top scope) variables $mysql_firewall_src
+#   Define which source ip/net allow for firewalling apache. Default: 0.0.0.0/0
+#   Can be defined also by the (top scope) variables $apache_firewall_src
 #   and $firewall_src
 #
 # [*firewall_dst*]
 #   Define which destination ip to use for firewalling. Default: $ipaddress
-#   Can be defined also by the (top scope) variables $mysql_firewall_dst
+#   Can be defined also by the (top scope) variables $apache_firewall_dst
 #   and $firewall_dst
 #
 # [*debug*]
 #   Set to 'true' to enable modules debugging
-#   Can be defined also by the (top scope) variables $mysql_debug and $debug
+#   Can be defined also by the (top scope) variables $apache_debug and $debug
 #
 # [*audit_only*]
 #   Set to 'true' if you don't intend to override existing configuration files
 #   and want to audit the difference between existing files and the ones
 #   managed by Puppet.
-#   Can be defined also by the (top scope) variables $mysql_audit_only
+#   Can be defined also by the (top scope) variables $apache_audit_only
 #   and $audit_only
 #
-# Default class params - As defined in mysql::params.
+# Default class params - As defined in apache::params.
 # Note that these variables are mostly defined and used in the module itself,
 # overriding the default values might not affected all the involved components.
 # Set and override them only if you know what you're doing.
 # Note also that you can't override/set them via top scope variables.
 #
 # [*package*]
-#   The name of mysql package
+#   The name of apache package
 #
 # [*service*]
-#   The name of mysql service
+#   The name of apache service
 #
 # [*service_status*]
-#   If the mysql service init script supports status argument
+#   If the apache service init script supports status argument
 #
 # [*process*]
-#   The name of mysql process
+#   The name of apache process
 #
 # [*process_args*]
-#   The name of mysql arguments. Used by puppi and monitor.
-#   Used only in case the mysql process name is generic (java, ruby...)
+#   The name of apache arguments. Used by puppi and monitor.
+#   Used only in case the apache process name is generic (java, ruby...)
 #
 # [*process_user*]
-#   The name of the user mysql runs with. Used by puppi and monitor.
+#   The name of the user apache runs with. Used by puppi and monitor.
 #
 # [*config_dir*]
 #   Main configuration directory. Used by puppi
@@ -185,19 +178,19 @@
 #   The listening port, if any, of the service.
 #   This is used by monitor, firewall and puppi (optional) components
 #   Note: This doesn't necessarily affect the service configuration file
-#   Can be defined also by the (top scope) variable $mysql_port
+#   Can be defined also by the (top scope) variable $apache_port
 #
 # [*protocol*]
 #   The protocol used by the the service.
 #   This is used by monitor, firewall and puppi (optional) components
-#   Can be defined also by the (top scope) variable $mysql_protocol
+#   Can be defined also by the (top scope) variable $apache_protocol
 #
 #
 # == Examples
 #
 # You can use this class in 2 ways:
-# - Set variables (at top scope level on in a ENC) and "include mysql"
-# - Call mysql as a parametrized class
+# - Set variables (at top scope level on in a ENC) and "include apache"
+# - Call apache as a parametrized class
 #
 # See README for details.
 #
@@ -205,8 +198,7 @@
 # == Author
 #   Alessandro Franceschi <al@lab42.it/>
 #
-class mysql (
-  $root_password       = params_lookup( 'root_password' ),
+class apache (
   $my_class            = params_lookup( 'my_class' ),
   $source              = params_lookup( 'source' ),
   $source_dir          = params_lookup( 'source_dir' ),
@@ -246,7 +238,7 @@ class mysql (
   $log_file            = params_lookup( 'log_file' ),
   $port                = params_lookup( 'port' ),
   $protocol            = params_lookup( 'protocol' )
-  ) inherits mysql::params {
+  ) inherits apache::params {
 
   $bool_source_dir_purge=any2bool($source_dir_purge)
   $bool_service_autorestart=any2bool($service_autorestart)
@@ -259,180 +251,184 @@ class mysql (
   $bool_debug=any2bool($debug)
   $bool_audit_only=any2bool($audit_only)
 
-  ### Root password setup
-  $random_password = fqdn_rand(100000000000)
-
-  $real_root_password = $mysql::root_password ? {
-    ''      => '',
-    auto    => $random_password,
-    default => $mysql::root_password,
+  ### Calculation of variables that dependes on arguments
+  $vdir = $::operatingsystem ? {
+    /(?i:Ubuntu|Debian|Mint)/ => "${apache::config_dir}/sites-available",
+    default                   => "${apache::config_dir}/conf.d",
   }
 
   ### Definition of some variables used in the module
-  $manage_package = $mysql::bool_absent ? {
+  $manage_package = $apache::bool_absent ? {
     true  => 'absent',
     false => 'present',
   }
 
-  $manage_service_enable = $mysql::bool_disableboot ? {
+  $manage_service_enable = $apache::bool_disableboot ? {
     true    => false,
-    default => $mysql::bool_disable ? {
-      true  => false,
-      false => true,
+    default => $apache::bool_disable ? {
+      true    => false,
+      default => $apache::bool_absent ? {
+        true  => false,
+        false => true,
+      },
     },
   }
 
-  $manage_service_ensure = $mysql::bool_disable ? {
-    true  => 'stopped',
-    false => 'running',
-  }
-
-  $manage_service_autorestart = $mysql::bool_service_autorestart ? {
-    false => undef,
-    true  => $mysql::bool_absent ? {
-      true  => undef,
-      false => 'Service[mysql]',
+  $manage_service_ensure = $apache::bool_disable ? {
+    true    => 'stopped',
+    default =>  $apache::bool_absent ? {
+      true    => 'stopped',
+      default => 'running',
     },
   }
 
-  $manage_file = $mysql::bool_absent ? {
+  $manage_service_autorestart = $apache::bool_service_autorestart ? {
+    true    => 'Service[apache]',
+    false   => undef,
+  }
+
+  $manage_file = $apache::bool_absent ? {
     true    => 'absent',
     default => 'present',
   }
 
-  if $mysql::bool_absent == true or $mysql::bool_disable == true or $mysql::bool_disableboot == true {
+  if $apache::bool_absent == true
+  or $apache::bool_disable == true
+  or $apache::bool_disableboot == true {
     $manage_monitor = false
   } else {
     $manage_monitor = true
   }
 
-  if $mysql::bool_absent == true or $mysql::bool_disable == true {
+  if $apache::bool_absent == true or $apache::bool_disable == true {
     $manage_firewall = false
   } else {
     $manage_firewall = true
   }
 
-  $manage_audit = $mysql::bool_audit_only ? {
+  $manage_audit = $apache::bool_audit_only ? {
     true  => 'all',
     false => undef,
   }
 
-  $manage_file_replace = $mysql::bool_audit_only ? {
+  $manage_file_replace = $apache::bool_audit_only ? {
     true  => false,
     false => true,
   }
 
-  $manage_file_source = $mysql::source ? {
+  $manage_file_source = $apache::source ? {
     ''        => undef,
-    default   => $mysql::source,
+    default   => $apache::source,
   }
 
-  $manage_file_content = $mysql::template ? {
+  $manage_file_content = $apache::template ? {
     ''        => undef,
-    default   => template($mysql::template),
+    default   => template($apache::template),
   }
-
-  # Set root password
-  if $mysql::real_root_password != '' { include mysql::password }
 
   ### Managed resources
-  package { 'mysql':
-    ensure => $mysql::manage_package,
-    name   => $mysql::package,
+  package { 'apache':
+    ensure => $apache::manage_package,
+    name   => $apache::package,
   }
 
-  if $mysql::bool_absent == false {
-    service { 'mysql':
-      ensure     => $mysql::manage_service_ensure,
-      name       => $mysql::service,
-      enable     => $mysql::manage_service_enable,
-      hasstatus  => $mysql::service_status,
-      pattern    => $mysql::process,
-      require    => [ Package['mysql'] , File['mysql.conf'] ]
-    }
+  service { 'apache':
+    ensure     => $apache::manage_service_ensure,
+    name       => $apache::service,
+    enable     => $apache::manage_service_enable,
+    hasstatus  => $apache::service_status,
+    pattern    => $apache::process,
+    require    => Package['apache'],
   }
 
-  file { 'mysql.conf':
-    ensure  => $mysql::manage_file,
-    path    => $mysql::config_file,
-    mode    => $mysql::config_file_mode,
-    owner   => $mysql::config_file_owner,
-    group   => $mysql::config_file_group,
-    require => Package['mysql'],
-    notify  => $mysql::manage_service_autorestart,
-    source  => $mysql::manage_file_source,
-    content => $mysql::manage_file_content,
-    replace => $mysql::manage_file_replace,
-    audit   => $mysql::manage_audit,
+  file { 'apache.conf':
+    ensure  => $apache::manage_file,
+    path    => $apache::config_file,
+    mode    => $apache::config_file_mode,
+    owner   => $apache::config_file_owner,
+    group   => $apache::config_file_group,
+    require => Package['apache'],
+    notify  => $apache::manage_service_autorestart,
+    source  => $apache::manage_file_source,
+    content => $apache::manage_file_content,
+    replace => $apache::manage_file_replace,
+    audit   => $apache::manage_audit,
   }
 
-  # The whole mysql configuration directory can be recursively overriden
-  if $mysql::source_dir {
-    file { 'mysql.dir':
+  # The whole apache configuration directory can be recursively overriden
+  if $apache::source_dir {
+    file { 'apache.dir':
       ensure  => directory,
-      path    => $mysql::config_dir,
-      require => Package['mysql'],
-      notify  => $mysql::manage_service_autorestart,
-      source  => $mysql::source_dir,
+      path    => $apache::config_dir,
+      require => Package['apache'],
+      notify  => $apache::manage_service_autorestart,
+      source  => $apache::source_dir,
       recurse => true,
-      purge   => $mysql::bool_source_dir_purge,
-      replace => $mysql::manage_file_replace,
-      audit   => $mysql::manage_audit,
+      purge   => $apache::bool_source_dir_purge,
+      replace => $apache::manage_file_replace,
+      audit   => $apache::manage_audit,
     }
   }
 
 
   ### Include custom class if $my_class is set
-  if $mysql::my_class {
-    include $mysql::my_class
+  if $apache::my_class {
+    include $apache::my_class
   }
 
 
   ### Provide puppi data, if enabled ( puppi => true )
-  if $mysql::bool_puppi == true {
+  if $apache::bool_puppi == true {
     $classvars=get_class_args()
-    puppi::ze { 'mysql':
-      ensure    => $mysql::manage_file,
+    puppi::ze { 'apache':
+      ensure    => $apache::manage_file,
       variables => $classvars,
-      helper    => $mysql::puppi_helper,
+      helper    => $apache::puppi_helper,
     }
   }
 
 
   ### Service monitoring, if enabled ( monitor => true )
-  if $mysql::bool_monitor == true {
-    monitor::process { 'mysql_process':
-      process  => $mysql::process,
-      service  => $mysql::service,
-      pidfile  => $mysql::pid_file,
-      user     => $mysql::process_user,
-      argument => $mysql::process_args,
-      tool     => $mysql::monitor_tool,
-      enable   => $mysql::manage_monitor,
+  if $apache::bool_monitor == true {
+    monitor::port { "apache_${apache::protocol}_${apache::port}":
+      protocol => $apache::protocol,
+      port     => $apache::port,
+      target   => $apache::monitor_target,
+      tool     => $apache::monitor_tool,
+      enable   => $apache::manage_monitor,
+    }
+    monitor::process { 'apache_process':
+      process  => $apache::process,
+      service  => $apache::service,
+      pidfile  => $apache::pid_file,
+      user     => $apache::process_user,
+      argument => $apache::process_args,
+      tool     => $apache::monitor_tool,
+      enable   => $apache::manage_monitor,
     }
   }
 
 
   ### Firewall management, if enabled ( firewall => true )
-  if $mysql::bool_firewall == true {
-    firewall { "mysql_${mysql::protocol}_${mysql::port}":
-      source      => $mysql::firewall_src,
-      destination => $mysql::firewall_dst,
-      protocol    => $mysql::protocol,
-      port        => $mysql::port,
+  if $apache::bool_firewall == true {
+    firewall { "apache_${apache::protocol}_${apache::port}":
+      source      => $apache::firewall_src,
+      destination => $apache::firewall_dst,
+      protocol    => $apache::protocol,
+      port        => $apache::port,
       action      => 'allow',
       direction   => 'input',
-      tool        => $mysql::firewall_tool,
-      enable      => $mysql::manage_firewall,
+      tool        => $apache::firewall_tool,
+      enable      => $apache::manage_firewall,
     }
   }
 
 
   ### Debugging, if enabled ( debug => true )
-  if $mysql::bool_debug == true {
-    file { 'debug_mysql':
-      ensure  => $mysql::manage_file,
-      path    => "${settings::vardir}/debug-mysql",
+  if $apache::bool_debug == true {
+    file { 'debug_apache':
+      ensure  => $apache::manage_file,
+      path    => "${settings::vardir}/debug-apache",
       mode    => '0640',
       owner   => 'root',
       group   => 'root',
