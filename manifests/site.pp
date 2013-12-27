@@ -13,10 +13,11 @@ Exec { 	path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 exec {"apt-update": command => "/usr/bin/apt-get update"}
 Exec["apt-update"] -> Package <| |> 
 
-# install apache, php and git
+# install apache, php and git,vim
 class{ 'apache': }
 class{ 'php': }
 class{ 'git': }
+class{ 'vim': }
 
 # create a virtual host using tha data provided in the vagrantfile
 apache::vhost { $fqdn:
