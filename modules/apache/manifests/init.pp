@@ -45,6 +45,11 @@
 #   configuration files. Default: true, Set to false if you don't want to
 #   automatically restart the service.
 #
+# [*service_requires*]
+#   Overwrites the service dependencies, which are by default: Package['apache'].
+#   Set this parameter to a custom set of requirements, if you want to let the
+#   Apache service depend on more than just the package dependency.
+#
 # [*absent*]
 #   Set to 'true' to remove package(s) installed by module
 #   Can be defined also by the (top scope) variable $apache_absent
@@ -162,6 +167,9 @@
 # [*config_file_init*]
 #   Path of configuration file sourced by init script
 #
+# [*config_file_default_purge*]
+#   Set to 'true' to purge the default configuration file
+#
 # [*pid_file*]
 #   Path of pid file. Used by monitor
 #
@@ -180,10 +188,17 @@
 #   Note: This doesn't necessarily affect the service configuration file
 #   Can be defined also by the (top scope) variable $apache_port
 #
+# [*ssl_port*]
+#   The ssl port, used if apache::ssl is included and monitor/firewall
+#   are enabled
+#
 # [*protocol*]
 #   The protocol used by the the service.
 #   This is used by monitor, firewall and puppi (optional) components
 #   Can be defined also by the (top scope) variable $apache_protocol
+#
+# [*version*]
+#   The version of apache package to be installed
 #
 #
 # == Examples
@@ -199,45 +214,49 @@
 #   Alessandro Franceschi <al@lab42.it/>
 #
 class apache (
-  $my_class            = params_lookup( 'my_class' ),
-  $source              = params_lookup( 'source' ),
-  $source_dir          = params_lookup( 'source_dir' ),
-  $source_dir_purge    = params_lookup( 'source_dir_purge' ),
-  $template            = params_lookup( 'template' ),
-  $service_autorestart = params_lookup( 'service_autorestart' , 'global' ),
-  $options             = params_lookup( 'options' ),
-  $absent              = params_lookup( 'absent' ),
-  $disable             = params_lookup( 'disable' ),
-  $disableboot         = params_lookup( 'disableboot' ),
-  $monitor             = params_lookup( 'monitor' , 'global' ),
-  $monitor_tool        = params_lookup( 'monitor_tool' , 'global' ),
-  $monitor_target      = params_lookup( 'monitor_target' , 'global' ),
-  $puppi               = params_lookup( 'puppi' , 'global' ),
-  $puppi_helper        = params_lookup( 'puppi_helper' , 'global' ),
-  $firewall            = params_lookup( 'firewall' , 'global' ),
-  $firewall_tool       = params_lookup( 'firewall_tool' , 'global' ),
-  $firewall_src        = params_lookup( 'firewall_src' , 'global' ),
-  $firewall_dst        = params_lookup( 'firewall_dst' , 'global' ),
-  $debug               = params_lookup( 'debug' , 'global' ),
-  $audit_only          = params_lookup( 'audit_only' , 'global' ),
-  $package             = params_lookup( 'package' ),
-  $service             = params_lookup( 'service' ),
-  $service_status      = params_lookup( 'service_status' ),
-  $process             = params_lookup( 'process' ),
-  $process_args        = params_lookup( 'process_args' ),
-  $process_user        = params_lookup( 'process_user' ),
-  $config_dir          = params_lookup( 'config_dir' ),
-  $config_file         = params_lookup( 'config_file' ),
-  $config_file_mode    = params_lookup( 'config_file_mode' ),
-  $config_file_owner   = params_lookup( 'config_file_owner' ),
-  $config_file_group   = params_lookup( 'config_file_group' ),
-  $config_file_init    = params_lookup( 'config_file_init' ),
-  $pid_file            = params_lookup( 'pid_file' ),
-  $data_dir            = params_lookup( 'data_dir' ),
-  $log_dir             = params_lookup( 'log_dir' ),
-  $log_file            = params_lookup( 'log_file' ),
-  $port                = params_lookup( 'port' ),
-  $protocol            = params_lookup( 'protocol' )
+  $my_class                  = params_lookup( 'my_class' ),
+  $source                    = params_lookup( 'source' ),
+  $source_dir                = params_lookup( 'source_dir' ),
+  $source_dir_purge          = params_lookup( 'source_dir_purge' ),
+  $template                  = params_lookup( 'template' ),
+  $service_autorestart       = params_lookup( 'service_autorestart' , 'global' ),
+  $options                   = params_lookup( 'options' ),
+  $absent                    = params_lookup( 'absent' ),
+  $disable                   = params_lookup( 'disable' ),
+  $disableboot               = params_lookup( 'disableboot' ),
+  $monitor                   = params_lookup( 'monitor' , 'global' ),
+  $monitor_tool              = params_lookup( 'monitor_tool' , 'global' ),
+  $monitor_target            = params_lookup( 'monitor_target' , 'global' ),
+  $puppi                     = params_lookup( 'puppi' , 'global' ),
+  $puppi_helper              = params_lookup( 'puppi_helper' , 'global' ),
+  $firewall                  = params_lookup( 'firewall' , 'global' ),
+  $firewall_tool             = params_lookup( 'firewall_tool' , 'global' ),
+  $firewall_src              = params_lookup( 'firewall_src' , 'global' ),
+  $firewall_dst              = params_lookup( 'firewall_dst' , 'global' ),
+  $debug                     = params_lookup( 'debug' , 'global' ),
+  $audit_only                = params_lookup( 'audit_only' , 'global' ),
+  $package                   = params_lookup( 'package' ),
+  $service                   = params_lookup( 'service' ),
+  $service_status            = params_lookup( 'service_status' ),
+  $service_requires          = params_lookup( 'service_requires' ),
+  $process                   = params_lookup( 'process' ),
+  $process_args              = params_lookup( 'process_args' ),
+  $process_user              = params_lookup( 'process_user' ),
+  $config_dir                = params_lookup( 'config_dir' ),
+  $config_file               = params_lookup( 'config_file' ),
+  $config_file_mode          = params_lookup( 'config_file_mode' ),
+  $config_file_owner         = params_lookup( 'config_file_owner' ),
+  $config_file_group         = params_lookup( 'config_file_group' ),
+  $config_file_init          = params_lookup( 'config_file_init' ),
+  $config_file_default_purge = params_lookup( 'config_file_default_purge'),
+  $pid_file                  = params_lookup( 'pid_file' ),
+  $data_dir                  = params_lookup( 'data_dir' ),
+  $log_dir                   = params_lookup( 'log_dir' ),
+  $log_file                  = params_lookup( 'log_file' ),
+  $port                      = params_lookup( 'port' ),
+  $ssl_port                  = params_lookup( 'ssl_port' ),
+  $protocol                  = params_lookup( 'protocol' ),
+  $version                   = params_lookup( 'version' )
   ) inherits apache::params {
 
   $bool_source_dir_purge=any2bool($source_dir_purge)
@@ -260,7 +279,10 @@ class apache (
   ### Definition of some variables used in the module
   $manage_package = $apache::bool_absent ? {
     true  => 'absent',
-    false => 'present',
+    false => $apache::version ? {
+        ''      => 'present',
+        default => $apache::version,
+    },
   }
 
   $manage_service_enable = $apache::bool_disableboot ? {
@@ -294,6 +316,7 @@ class apache (
 
   if $apache::bool_absent == true
   or $apache::bool_disable == true
+  or $apache::bool_monitor == false
   or $apache::bool_disableboot == true {
     $manage_monitor = false
   } else {
@@ -338,7 +361,7 @@ class apache (
     enable     => $apache::manage_service_enable,
     hasstatus  => $apache::service_status,
     pattern    => $apache::process,
-    require    => Package['apache'],
+    require    => $service_requires,
   }
 
   file { 'apache.conf':
@@ -365,11 +388,18 @@ class apache (
       source  => $apache::source_dir,
       recurse => true,
       purge   => $apache::bool_source_dir_purge,
+      force   => $apache::bool_source_dir_purge,
       replace => $apache::manage_file_replace,
       audit   => $apache::manage_audit,
     }
   }
 
+  if $apache::config_file_default_purge {
+    apache::vhost { 'default':
+      enable    => false,
+      priority  => '',
+    }
+  }
 
   ### Include custom class if $my_class is set
   if $apache::my_class {
@@ -389,7 +419,7 @@ class apache (
 
 
   ### Service monitoring, if enabled ( monitor => true )
-  if $apache::bool_monitor == true {
+  if $apache::monitor_tool {
     monitor::port { "apache_${apache::protocol}_${apache::port}":
       protocol => $apache::protocol,
       port     => $apache::port,

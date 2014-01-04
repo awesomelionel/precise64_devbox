@@ -63,6 +63,7 @@ define apache::module (
   if $install_package != false {
     $modpackage_basename = $::operatingsystem ? {
       /(?i:Ubuntu|Debian|Mint)/ => 'libapache2-mod-',
+      /(?i:SLES|OpenSuSE)/      => 'apache2-mod_',
       default                   => 'mod_',
     }
 
@@ -77,6 +78,7 @@ define apache::module (
       notify  => $manage_service_autorestart,
       require => Package['apache'],
     }
+
   }
 
 
@@ -104,10 +106,21 @@ define apache::module (
   or $::operatingsystem == 'Mint' {
     case $ensure {
       'present': {
+
+        $exec_a2enmod_subscribe = $install_package ? {
+          false   => undef,
+          default => Package["ApacheModule_${name}"]
+        }
+        $exec_a2dismode_before = $install_package ? {
+          false   => undef,
+          default => Package["ApacheModule_${name}"]
+        }
+
         exec { "/usr/sbin/a2enmod ${name}":
           unless    => "/bin/sh -c '[ -L ${apache::config_dir}/mods-enabled/${name}.load ] && [ ${apache::config_dir}/mods-enabled/${name}.load -ef ${apache::config_dir}/mods-available/${name}.load ]'",
           notify    => $manage_service_autorestart,
           require   => Package['apache'],
+          subscribe => $exec_a2enmod_subscribe,
         }
       }
       'absent': {
@@ -115,6 +128,7 @@ define apache::module (
           onlyif    => "/bin/sh -c '[ -L ${apache::config_dir}/mods-enabled/${name}.load ] && [ ${apache::config_dir}/mods-enabled/${name}.load -ef ${apache::config_dir}/mods-available/${name}.load ]'",
           notify    => $manage_service_autorestart,
           require   => Package['apache'],
+          before    => $exec_a2dismode_before,
         }
       }
       default: {

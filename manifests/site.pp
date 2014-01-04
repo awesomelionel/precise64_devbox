@@ -1,3 +1,5 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 #############################
 # Vagrant LAMP Stack Config #
 #############################
@@ -7,17 +9,12 @@
 # PHP version : 5.3         #
 #############################
 
-#Run Apt-get update before anything
-Exec { 	path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-}
-exec {"apt-update": command => "/usr/bin/apt-get update"}
-Exec["apt-update"] -> Package <| |> 
-
-# install apache, php and git,vim
+# install apache, php and git
 class{ 'apache': }
 class{ 'php': }
 class{ 'git': }
 class{ 'vim': }
+class{ 'redis': }
 
 # create a virtual host using tha data provided in the vagrantfile
 apache::vhost { $fqdn:
@@ -47,51 +44,11 @@ mysql::grant { $db_name:
   mysql_grant_filepath => '/root/mysql',
 }
 
-# set pear auto_discover to 1
-php::pear::config{ 'auto_discover':
-  value => '1',
-}
-
-#install pear packages
-php::pear::module{ 'pear.phpunit.de/PHPUnit': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'pear.pdepend.org/PHP_Depend': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'pear.phpmd.org/PHP_PMD': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'components.ez.no/Base': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'components.ez.no/ConsoleTools': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'pear.php.net/PHP_CodeSniffer': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'pear.symfony.com/Finder': 
-  use_package => 'no',
-}
-
-php::pear::module{ 'pear.phpunit.de/phpcpd': 
-  use_package => 'no',
-}
-
 # rapid redirecting to project's root when logging in 
 file { '/home/vagrant/.bashrc':
   ensure => 'present',
   content => 'cd /vagrant',
 }
-
-
 
 # ensure the docroot is a directory, that's it.
 file { $docroot:
@@ -102,4 +59,5 @@ class { 'rbenv': }
 rbenv::plugin { [ 'sstephenson/rbenv-vars', 'sstephenson/ruby-build' ]: }
 rbenv::build { '2.0.0-p247': global => true }
 rbenv::gem { 'thor': ruby_version   => '2.0.0-p247' }
+rbenv::gem { 'middleman': ruby_version   => '2.0.0-p247' }
 

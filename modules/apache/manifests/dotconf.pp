@@ -18,7 +18,7 @@
 # == Usage
 # apache::dotconf { "sarg": source => 'puppet://$servername/sarg/sarg.conf' }
 # or
-# apache::dotconf { "trac": content => 'template("trac/apache.conf.erb")' }
+# apache::dotconf { "trac": content => template("trac/apache.conf.erb") }
 #
 define apache::dotconf (
   $source  = '' ,
@@ -35,7 +35,7 @@ define apache::dotconf (
     default   => $content,
   }
 
-  file { "Apache_$name.conf":
+  file { "Apache_${name}.conf":
     ensure  => $ensure,
     path    => "${apache::config_dir}/conf.d/${name}.conf",
     mode    => $apache::config_file_mode,

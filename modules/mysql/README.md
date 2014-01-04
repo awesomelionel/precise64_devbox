@@ -1,4 +1,4 @@
-= Puppet module: mysql
+# Puppet module: mysql
 
 This is a Puppet mysql module from the second generation of Example42 Puppet Modules.
 
@@ -14,7 +14,7 @@ This module requires functions provided by the Example42 Puppi module.
 
 For detailed info about the logic and usage patterns of Example42 modules read README.usage on Example42 main modules set.
 
-== USAGE - Module specific
+## USAGE - Module specific
 
 * Set a specific (cleartext) mysql root password
 
@@ -28,7 +28,7 @@ For detailed info about the logic and usage patterns of Example42 modules read R
           root_password => 'auto',          
         }
 
-* Create a new grant and database
+* Create a new grant and database. mysql_db_init_query_file is optional and will run only once.
 
         mysql::grant { 'db1':
           mysql_privileges => 'ALL',
@@ -36,10 +36,11 @@ For detailed info about the logic and usage patterns of Example42 modules read R
           mysql_db => 'db1',
           mysql_user => 'db1',
           mysql_host => 'host',
+          mysql_db_init_query_file => '/full/path/to/the/schema.sql',
         }
 
 
-== USAGE - Basic management
+## USAGE - Basic management
 
 * Install mysql with default settings
 
@@ -57,6 +58,12 @@ For detailed info about the logic and usage patterns of Example42 modules read R
           disableboot => true
         }
 
+* Install a specific version of mysqlpackage
+
+        class { 'mysql':
+          version => '1.0.1',
+        }
+
 * Remove mysql package
 
         class { "mysql":
@@ -70,7 +77,7 @@ For detailed info about the logic and usage patterns of Example42 modules read R
         }
 
 
-== USAGE - Overrides and Customizations
+## USAGE - Overrides and Customizations
 * Use custom sources for main config file 
 
         class { "mysql":
@@ -109,7 +116,7 @@ For detailed info about the logic and usage patterns of Example42 modules read R
         }
 
 
-== USAGE - Example42 extensions management 
+## USAGE - Example42 extensions management 
 * Activate puppi (recommended, but disabled by default)
   Note that this option requires the usage of Example42 puppi module
 
@@ -144,6 +151,5 @@ For detailed info about the logic and usage patterns of Example42 modules read R
         }
 
 
-== CONTINUOUS TESTING
 
-{<img src="https://travis-ci.org/example42/puppet-mysql.png?branch=master" alt="Build Status" />}[https://travis-ci.org/example42/puppet-mysql]
+[![Build Status](https://travis-ci.org/example42/puppet-mysql.png?branch=master)](https://travis-ci.org/example42/puppet-mysql)
